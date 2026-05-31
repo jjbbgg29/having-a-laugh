@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wellness Challenge Tracker</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.8.0/dist/tabler-icons.min.css" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff; --bg2: #f5f5f3; --bg3: #ebebea;
+    --text: #1a1a1a; --text2: #6b6b6a; --text3: #a0a09e;
+    --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.2);
+    --radius: 8px; --radius-lg: 12px;
+    --green: #1D9E75; --green-light: #E1F5EE; --green-mid: #9FE1CB; --green-dark: #0F6E56; --green-deeper: #085041;
+    --danger: #c0392b; --danger-bg: #fdf0ef;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a; --bg2: #262624; --bg3: #2e2e2c;
+      --text: #f0efe8; --text2: #9a9990; --text3: #5e5e5a;
+      --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
+      --green-light: #0a2e22; --green-mid: #0f4a34; --green-deeper: #9FE1CB;
+      --danger-bg: #2e1a18;
+    }
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; padding: 2rem 1rem; }
+  .app { max-width: 680px; margin: 0 auto; }
+  .topbar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
+  .header h1 { font-size: 24px; font-weight: 600; }
+  .header p { font-size: 14px; color: var(--text2); margin-top: 4px; }
+  .settings-btn { display: flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; border: 0.5px solid var(--border2); background: var(--bg); color: var(--text2); transition: background 0.15s; white-space: nowrap; }
+  .settings-btn:hover { background: var(--bg2); color: var(--text); }
+  .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.5rem; }
+  .stat { background: var(--bg); border-radius: var(--radius); padding: 14px 16px; border: 0.5px solid var(--border); }
+  .stat-label { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+  .stat-value { font-size: 26px; font-weight: 600; }
+  .stat-sub { font-size: 12px; color: var(--text3); }
+  .progress-bar-wrap { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 1.5rem; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 13px; color: var(--text2); margin-bottom: 8px; }
+  .progress-track { height: 6px; background: var(--bg3); border-radius: 999px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--green); border-radius: 999px; transition: width 0.4s ease; }
+  .dimensions-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 1.5rem; }
+  @media (max-width: 500px) { .dimensions-grid { grid-template-columns: 1fr; } }
+  .dim-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; cursor: pointer; transition: border-color 0.15s; position: relative; }
+  .dim-card:hover { border-color: var(--border2); }
+  .dim-card.done { border-color: var(--green); background: var(--green-light); }
+  .dim-header { display: flex; align-items: center; gap: 10px; }
+  .dim-icon { font-size: 20px; width: 36px; height: 36px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; background: var(--bg2); flex-shrink: 0; color: var(--text2); }
+  .dim-card.done .dim-icon { background: var(--green-mid); color: var(--green-dark); }
+  .dim-title { font-size: 14px; font-weight: 600; }
+  .dim-desc { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .dim-check { position: absolute; top: 12px; right: 12px; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 11px; color: transparent; }
+  .dim-card.done .dim-check { background: var(--green); border-color: var(--green); color: white; }
+  .dim-tasks { margin-top: 10px; padding-top: 10px; border-top: 0.5px solid var(--border); display: none; flex-direction: column; gap: 6px; }
+  .dim-card.expanded .dim-tasks { display: flex; }
+  .dim-card.done .dim-tasks { border-top-color: var(--green-mid); }
+  .task-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text2); cursor: pointer; padding: 3px 0; }
+  .task-item input[type=checkbox] { width: 15px; height: 15px; cursor: pointer; accent-color: var(--green); flex-shrink: 0; }
+  .task-item.checked { color: var(--text3); text-decoration: line-through; }
+  .bottom-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .btn { padding: 10px 18px; border-radius: var(--radius); font-size: 14px; font-weight: 500; cursor: pointer; border: 0.5px solid var(--border2); background: var(--bg); color: var(--text); transition: background 0.15s; }
+  .btn:hover { background: var(--bg2); }
+  .btn-primary { background: var(--green); border-color: var(--green); color: white; }
+  .btn-primary:hover { background: var(--green-dark); }
+  .btn-danger { border-color: var(--danger); color: var(--danger); }
+  .btn-danger:hover { background: var(--danger-bg); }
+  .all-done-banner { background: var(--green-light); border: 0.5px solid var(--green-mid); border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 1.5rem; display: none; align-items: center; gap: 12px; }
+  .all-done-banner.show { display: flex; }
+  .all-done-banner i { font-size: 24px; color: var(--green); }
+  .all-done-banner p { font-size: 14px; color: var(--green-deeper); font-weight: 600; }
+  .all-done-banner span { font-size: 13px; color: var(--green-dark); }
+  .notes-wrap { margin-top: 4px; }
+  .notes-label { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.05em; }
+  .notes-saved { font-size: 11px; color: var(--green); opacity: 0; transition: opacity 0.3s; font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .notes-saved.show { opacity: 1; }
+  .notes-box { width: 100%; min-height: 110px; padding: 12px 14px; border-radius: var(--radius); border: 0.5px solid var(--border2); background: var(--bg); color: var(--text); font-size: 14px; font-family: inherit; resize: vertical; line-height: 1.6; transition: border-color 0.15s; }
+  .notes-box:focus { outline: none; border-color: var(--green); }
+  .notes-box::placeholder { color: var(--text3); }
+  .settings-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 100; display: none; }
+  .settings-overlay.open { display: block; }
+  .settings-panel { position: fixed; top: 0; right: 0; width: 360px; max-width: 95vw; height: 100%; overflow-y: auto; background: var(--bg); border-left: 0.5px solid var(--border); padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; z-index: 101; }
+  .settings-top { display: flex; justify-content: space-between; align-items: center; }
+  .settings-top h2 { font-size: 18px; font-weight: 600; }
+  .close-btn { background: none; border: none; cursor: pointer; font-size: 22px; color: var(--text2); padding: 4px; display: flex; align-items: center; }
+  .close-btn:hover { color: var(--text); }
+  .settings-section-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
+  .challenge-field { display: flex; align-items: center; gap: 10px; }
+  .challenge-field label { font-size: 14px; flex: 1; }
+  .challenge-field input[type=number] { width: 72px; padding: 8px 10px; border-radius: var(--radius); border: 0.5px solid var(--border2); background: var(--bg2); color: var(--text); font-size: 14px; }
+  .dim-settings-block { border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 8px; }
+  .dim-settings-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; background: var(--bg); }
+  .dim-settings-header:hover { background: var(--bg2); }
+  .dim-settings-header i.dim-icon-sm { font-size: 18px; color: var(--text2); }
+  .dim-name-input { font-size: 14px; font-weight: 600; border: none; background: transparent; flex: 1; outline: none; min-width: 0; color: var(--text); }
+  .dim-name-input:focus { background: var(--bg2); border-radius: 4px; padding: 2px 6px; }
+  .dim-settings-toggle { font-size: 16px; color: var(--text3); transition: transform 0.2s; }
+  .dim-settings-block.open .dim-settings-toggle { transform: rotate(180deg); }
+  .dim-tasks-edit { display: none; padding: 0 14px 12px; border-top: 0.5px solid var(--border); background: var(--bg2); }
+  .dim-settings-block.open .dim-tasks-edit { display: block; }
+  .task-edit-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .task-edit-row input[type=text] { flex: 1; padding: 8px 10px; border-radius: var(--radius); border: 0.5px solid var(--border2); background: var(--bg); color: var(--text); font-size: 13px; min-width: 0; }
+  .task-edit-row input[type=text]:focus { outline: none; border-color: var(--green); }
+  .task-del-btn { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 18px; display: flex; align-items: center; padding: 4px; flex-shrink: 0; }
+  .task-del-btn:hover { color: var(--danger); }
+  .add-task-btn { margin-top: 10px; font-size: 13px; color: var(--green); background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 4px 0; }
+  .add-task-btn:hover { color: var(--green-dark); }
+  .settings-save-btn { width: 100%; padding: 12px; border-radius: var(--radius); background: var(--green); border: none; color: white; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .settings-save-btn:hover { background: var(--green-dark); }
+  .settings-reset-link { font-size: 13px; color: var(--danger); background: none; border: none; cursor: pointer; text-align: center; display: block; width: 100%; padding: 6px; }
+  .settings-reset-link:hover { text-decoration: underline; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<h1 class="sr-only">Eight dimensions of wellness daily tracker</h1>
+<div class="app">
+  <div class="topbar">
+    <div class="header">
+      <h1>Wellness challenge</h1>
+      <p>Check off each dimension every day. Complete all 8 to advance your streak.</p>
+    </div>
+    <button class="settings-btn" onclick="openSettings()">
+      <i class="ti ti-settings" aria-hidden="true"></i> Settings
+    </button>
+  </div>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-label">Day</div><div class="stat-value" id="day-count">1</div><div class="stat-sub" id="stat-of">of 75</div></div>
+    <div class="stat"><div class="stat-label">Days left</div><div class="stat-value" id="days-left">75</div><div class="stat-sub">remaining</div></div>
+    <div class="stat"><div class="stat-label">Streak</div><div class="stat-value" id="streak">0</div><div class="stat-sub">days complete</div></div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-label"><span>Overall progress</span><span id="prog-pct">0%</span></div>
+    <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div class="all-done-banner" id="done-banner">
+    <i class="ti ti-trophy" aria-hidden="true"></i>
+    <div><p>All dimensions complete!</p><span>Amazing work today. Mark complete to advance your streak.</span></div>
+  </div>
+  <div class="dimensions-grid" id="dim-grid"></div>
+  <div class="bottom-row">
+    <button class="btn btn-primary" onclick="completeDay()">Mark day complete</button>
+    <button class="btn" onclick="toggleAll()">Check all</button>
+    <button class="btn btn-danger" onclick="resetToday()">Reset today</button>
+  </div>
+  <div class="notes-wrap">
+    <div class="notes-label">
+      <span>Notes for today</span>
+      <span class="notes-saved" id="notes-saved">Saved</span>
+    </div>
+    <textarea class="notes-box" id="daily-notes" placeholder="How are you feeling? What went well? What was hard?"></textarea>
+  </div>
+</div>
+
+<div class="settings-overlay" id="settings-overlay" onclick="overlayClick(event)"></div>
+<div class="settings-panel" id="settings-panel" style="display:none;flex-direction:column;gap:1.25rem;">
+  <div class="settings-top">
+    <h2>Settings</h2>
+    <button class="close-btn" onclick="closeSettings()" aria-label="Close settings"><i class="ti ti-x"></i></button>
+  </div>
+  <div>
+    <div class="settings-section-label">Challenge</div>
+    <div class="challenge-field">
+      <label for="challenge-days">Total days</label>
+      <input type="number" id="challenge-days" min="1" max="365" value="75" />
+    </div>
+  </div>
+  <div>
+    <div class="settings-section-label">Dimensions &amp; tasks</div>
+    <div id="dim-settings-list"></div>
+  </div>
+  <button class="settings-save-btn" onclick="saveSettings()">Save changes</button>
+  <button class="settings-reset-link" onclick="resetAllData()">Reset all progress data</button>
+</div>
+
+<script>
+const DEFAULT_DIMENSIONS = [
+  { id:"physical",  icon:"ti-run",       title:"Physical",      desc:"Exercise & movement",      tasks:["30 min workout","10,000 steps","Stretch for 10 min"] },
+  { id:"emotional", icon:"ti-heart",     title:"Emotional",     desc:"Feelings & self-awareness", tasks:["Journal for 5 min","Name 3 emotions today","Practice gratitude"] },
+  { id:"intellectual",icon:"ti-book",   title:"Intellectual",  desc:"Learning & curiosity",      tasks:["Read for 20 min","Learn something new","No mindless scrolling"] },
+  { id:"social",    icon:"ti-users",     title:"Social",        desc:"Relationships & community", tasks:["Meaningful conversation","Reach out to someone","Act of kindness"] },
+  { id:"spiritual", icon:"ti-sparkles",  title:"Spiritual",     desc:"Purpose & meaning",         tasks:["5 min meditation","Reflect on values","Time in nature"] },
+  { id:"environmental",icon:"ti-leaf",  title:"Environmental", desc:"Spaces & surroundings",     tasks:["Tidy your space","Spend time outside","Reduce screen time"] },
+  { id:"occupational",icon:"ti-briefcase",title:"Occupational",desc:"Work & purpose",            tasks:["Work on a goal","Set tomorrow's priorities","Rest from work tonight"] },
+  { id:"financial", icon:"ti-coin",      title:"Financial",     desc:"Money & security",          tasks:["Track spending","No impulse purchases","Review one financial goal"] }
+];
+
+const todayKey = () => new Date().toISOString().split("T")[0];
+let state = JSON.parse(localStorage.getItem("wellness_state") || "{}");
+let config = JSON.parse(localStorage.getItem("wellness_config") || JSON.stringify({ days:75, dimensions:DEFAULT_DIMENSIONS }));
+let saveTimer = null;
+
+function getToday() {
+  const k = todayKey();
+  if (!state[k]) state[k] = { tasks:{}, completed:false, notes:"" };
+  return state[k];
+}
+function save() { localStorage.setItem("wellness_state", JSON.stringify(state)); }
+function saveConfig() { localStorage.setItem("wellness_config", JSON.stringify(config)); }
+
+function getStreak() {
+  let s=0; const today=new Date();
+  for (let i=0;i<config.days;i++) {
+    const d=new Date(today); d.setDate(d.getDate()-i);
+    const k=d.toISOString().split("T")[0];
+    if (state[k]&&state[k].completed) s++; else if (i>0) break;
+  }
+  return s;
+}
+function getDayCount() { return Math.min(Object.values(state).filter(d=>d.completed).length+1,config.days); }
+function allChecked() {
+  const today=getToday();
+  return config.dimensions.every(dim=>dim.tasks.every(function(_,ti){return today.tasks[dim.id+"_"+ti];}));
+}
+function saveNotes(val) {
+  getToday().notes=val; save();
+  clearTimeout(saveTimer);
+  var el=document.getElementById("notes-saved");
+  el.classList.add("show");
+  saveTimer=setTimeout(function(){el.classList.remove("show");},1800);
+}
+function render() {
+  var today=getToday();
+  var dayCount=getDayCount();
+  var pct=Math.round((Object.values(state).filter(function(d){return d.completed;}).length/config.days)*100);
+  document.getElementById("day-count").textContent=dayCount;
+  document.getElementById("stat-of").textContent="of "+config.days;
+  document.getElementById("days-left").textContent=Math.max(config.days-dayCount+1,0);
+  document.getElementById("streak").textContent=getStreak();
+  document.getElementById("prog-pct").textContent=pct+"%";
+  document.getElementById("prog-fill").style.width=pct+"%";
+  document.getElementById("done-banner").classList.toggle("show",allChecked()&&!today.completed);
+  var ta=document.getElementById("daily-notes");
+  if (ta&&document.activeElement!==ta) ta.value=today.notes||"";
+  var grid=document.getElementById("dim-grid");
+  var expandedCard=document.querySelector(".dim-card.expanded");
+  var expandedId=expandedCard?expandedCard.getAttribute("data-id"):null;
+  grid.innerHTML="";
+  config.dimensions.forEach(function(dim){
+    var tasksChecked=dim.tasks.filter(function(_,ti){return today.tasks[dim.id+"_"+ti];}).length;
+    var dimDone=tasksChecked===dim.tasks.length;
+    var card=document.createElement("div");
+    card.className="dim-card"+(dimDone?" done":"")+(expandedId===dim.id?" expanded":"");
+    card.setAttribute("data-id",dim.id);
+    card.innerHTML='<div class="dim-header"><div class="dim-icon"><i class="ti '+dim.icon+'" aria-hidden="true"></i></div><div><div class="dim-title">'+dim.title+'</div><div class="dim-desc">'+tasksChecked+'/'+dim.tasks.length+' · '+dim.desc+'</div></div></div><div class="dim-check"><i class="ti ti-check" aria-hidden="true"></i></div><div class="dim-tasks">'+dim.tasks.map(function(t,ti){var c=today.tasks[dim.id+"_"+ti];return'<label class="task-item '+(c?"checked":"")+'"><input type="checkbox" '+(c?"checked":"")+'  data-dim="'+dim.id+'" data-ti="'+ti+'"/>'+t+'</label>';}).join("")+'</div>';
+    card.querySelector(".dim-header").addEventListener("click",function(){
+      var isExp=card.classList.contains("expanded");
+      document.querySelectorAll(".dim-card").forEach(function(c){c.classList.remove("expanded");});
+      if(!isExp) card.classList.add("expanded");
+    });
+    card.querySelectorAll("input[type=checkbox]").forEach(function(cb){
+      cb.addEventListener("change",function(e){
+        e.stopPropagation();
+        getToday().tasks[e.target.getAttribute("data-dim")+"_"+e.target.getAttribute("data-ti")]=e.target.checked;
+        save(); render();
+      });
+    });
+    grid.appendChild(card);
+  });
+}
+document.getElementById("daily-notes").addEventListener("input",function(e){saveNotes(e.target.value);});
+function completeDay(){if(!allChecked()){alert("Complete all tasks in all dimensions first!");return;}getToday().completed=true;save();render();}
+function toggleAll(){var today=getToday(),allOn=allChecked();config.dimensions.forEach(function(dim){dim.tasks.forEach(function(_,ti){today.tasks[dim.id+"_"+ti]=!allOn;});});save();render();}
+function resetToday(){var k=todayKey();if(state[k])state[k]={tasks:{},completed:false,notes:""};save();render();}
+function openSettings(){document.getElementById("challenge-days").value=config.days;renderDimSettings();document.getElementById("settings-overlay").classList.add("open");document.getElementById("settings-panel").style.display="flex";}
+function closeSettings(){document.getElementById("settings-overlay").classList.remove("open");document.getElementById("settings-panel").style.display="none";}
+function overlayClick(e){if(e.target===document.getElementById("settings-overlay"))closeSettings();}
+function renderDimSettings(){
+  var list=document.getElementById("dim-settings-list");list.innerHTML="";
+  config.dimensions.forEach(function(dim,di){
+    var block=document.createElement("div");block.className="dim-settings-block";
+    block.innerHTML='<div class="dim-settings-header" onclick="this.parentElement.classList.toggle(\'open\')"><i class="ti '+dim.icon+' dim-icon-sm" aria-hidden="true"></i><input class="dim-name-input" type="text" value="'+dim.title+'" data-di="'+di+'" onclick="event.stopPropagation()" placeholder="Dimension name"/><i class="ti ti-chevron-down dim-settings-toggle" aria-hidden="true"></i></div><div class="dim-tasks-edit">'+dim.tasks.map(function(t,ti){return'<div class="task-edit-row"><input type="text" value="'+t+'" data-di="'+di+'" data-ti="'+ti+'" placeholder="Task description"/><button class="task-del-btn" onclick="deleteTask('+di+','+ti+')" aria-label="Delete task"><i class="ti ti-trash" aria-hidden="true"></i></button></div>';}).join('')+'<button class="add-task-btn" onclick="addTask('+di+')"><i class="ti ti-plus" aria-hidden="true"></i> Add task</button></div>';
+    list.appendChild(block);
+  });
+}
+function addTask(di){config.dimensions[di].tasks.push("New task");renderDimSettings();document.querySelectorAll(".dim-settings-block")[di].classList.add("open");}
+function deleteTask(di,ti){if(config.dimensions[di].tasks.length<=1){alert("Each dimension needs at least one task.");return;}config.dimensions[di].tasks.splice(ti,1);renderDimSettings();document.querySelectorAll(".dim-settings-block")[di].classList.add("open");}
+function saveSettings(){
+  config.days=parseInt(document.getElementById("challenge-days").value)||75;
+  document.querySelectorAll(".dim-settings-block").forEach(function(block,di){
+    var n=block.querySelector(".dim-name-input");
+    if(n)config.dimensions[di].title=n.value.trim()||config.dimensions[di].title;
+    block.querySelectorAll(".task-edit-row input[type=text]").forEach(function(inp,ti){config.dimensions[di].tasks[ti]=inp.value.trim()||config.dimensions[di].tasks[ti];});
+  });
+  saveConfig();closeSettings();render();
+}
+function resetAllData(){if(confirm("This will delete all your progress. Are you sure?")){localStorage.removeItem("wellness_state");localStorage.removeItem("wellness_config");state={};config=JSON.parse(JSON.stringify({days:75,dimensions:DEFAULT_DIMENSIONS}));closeSettings();render();}}
+render();
+</script>
+</body>
+</html>
