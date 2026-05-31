@@ -1,0 +1,10 @@
+title: wellness tracker
+description: wellness tracker
+theme: jekyll-theme-primer
+
+# Optional settings
+baseurl: ""
+url: "https://jjbbgg29.github.io/having-a-laugh"
+plugins:
+  - jekyll-seo-tag
+  - jekyll-github-metadata
