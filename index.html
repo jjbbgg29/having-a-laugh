@@ -13,6 +13,7 @@
     --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.2);
     --radius: 8px; --radius-lg: 12px;
     --green: #1D9E75; --green-light: #E1F5EE; --green-mid: #9FE1CB; --green-dark: #0F6E56; --green-deeper: #085041;
+    --amber: #D97706; --amber-light: #FFF8E7; --amber-border: #FCD34D; --amber-dark: #B45309; --amber-text: #92400E;
     --danger: #c0392b; --danger-bg: #fdf0ef;
   }
   @media (prefers-color-scheme: dark) {
@@ -21,6 +22,7 @@
       --text: #f0efe8; --text2: #9a9990; --text3: #5e5e5a;
       --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
       --green-light: #0a2e22; --green-mid: #0f4a34; --green-deeper: #9FE1CB;
+      --amber-light: #2e200a; --amber-text: #FCD34D;
       --danger-bg: #2e1a18;
     }
   }
@@ -29,19 +31,21 @@
   .topbar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
   .header h1 { font-size: 24px; font-weight: 600; }
   .header p { font-size: 14px; color: var(--text2); margin-top: 4px; }
-  .settings-btn { display: flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; border: 0.5px solid var(--border2); background: var(--bg); color: var(--text); }
+  .settings-btn { display: flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; border: 0.5px solid var(--border2); background: var(--bg); color: var(--text2); transition: background 0.15s; white-space: nowrap; }
   .settings-btn:hover { background: var(--bg2); color: var(--text); }
-  .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.5rem; }
-  .stat { background: var(--bg); border-radius: var(--radius); padding: 14px 16px; border: 0.5px solid var(--border); }
-  .stat-label { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
-  .stat-value { font-size: 26px; font-weight: 600; }
-  .stat-sub { font-size: 12px; color: var(--text3); }
+  .stats-row { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin-bottom: 1.5rem; }
+  .stat { background: var(--bg); border-radius: var(--radius); padding: 10px 12px; border: 0.5px solid var(--border); }
+  .stat-label { font-size: 11px; color: var(--text2); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stat-value { font-size: 22px; font-weight: 600; }
+  .stat-sub { font-size: 11px; color: var(--text3); }
+  .stat.perfect .stat-value { color: var(--green); }
+  .stat.partial .stat-value { color: var(--amber); }
   .progress-bar-wrap { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 1.5rem; }
   .progress-label { display: flex; justify-content: space-between; font-size: 13px; color: var(--text2); margin-bottom: 8px; }
   .progress-track { height: 6px; background: var(--bg3); border-radius: 999px; overflow: hidden; }
   .progress-fill { height: 100%; background: var(--green); border-radius: 999px; transition: width 0.4s ease; }
   .dimensions-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 1.5rem; }
-  @media (max-width: 500px) { .dimensions-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 500px) { .dimensions-grid { grid-template-columns: 1fr; } .stats-row { grid-template-columns: repeat(3,1fr); } .stats-row .stat:nth-child(4), .stats-row .stat:nth-child(5) { grid-column: span 1; } }
   .dim-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; cursor: pointer; transition: border-color 0.15s; position: relative; }
   .dim-card:hover { border-color: var(--border2); }
   .dim-card.done { border-color: var(--green); background: var(--green-light); }
@@ -50,7 +54,7 @@
   .dim-card.done .dim-icon { background: var(--green-mid); color: var(--green-dark); }
   .dim-title { font-size: 14px; font-weight: 600; }
   .dim-desc { font-size: 12px; color: var(--text2); margin-top: 2px; }
-  .dim-check { position: absolute; top: 12px; right: 12px; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; }
+  .dim-check { position: absolute; top: 12px; right: 12px; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 11px; color: transparent; }
   .dim-card.done .dim-check { background: var(--green); border-color: var(--green); color: white; }
   .dim-tasks { margin-top: 10px; padding-top: 10px; border-top: 0.5px solid var(--border); display: none; flex-direction: column; gap: 6px; }
   .dim-card.expanded .dim-tasks { display: flex; }
@@ -58,29 +62,63 @@
   .task-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text2); cursor: pointer; padding: 3px 0; }
   .task-item input[type=checkbox] { width: 15px; height: 15px; cursor: pointer; accent-color: var(--green); flex-shrink: 0; }
   .task-item.checked { color: var(--text3); text-decoration: line-through; }
-  .bottom-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .complete-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem; }
   .btn { padding: 10px 18px; border-radius: var(--radius); font-size: 14px; font-weight: 500; cursor: pointer; border: 0.5px solid var(--border2); background: var(--bg); color: var(--text); transition: background 0.15s; }
   .btn:hover { background: var(--bg2); }
-  .btn-primary { background: var(--green); border-color: var(--green); color: white; }
-  .btn-primary:hover { background: var(--green-dark); }
+  .btn-perfect { background: var(--green); border-color: var(--green); color: white; }
+  .btn-perfect:hover { background: var(--green-dark); }
+  .btn-partial { background: var(--amber); border-color: var(--amber); color: white; }
+  .btn-partial:hover { background: var(--amber-dark); }
   .btn-danger { border-color: var(--danger); color: var(--danger); }
   .btn-danger:hover { background: var(--danger-bg); }
+  .partial-prompt { background: var(--amber-light); border: 0.5px solid var(--amber-border); border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 1rem; display: none; }
+  .partial-prompt.show { display: block; }
+  .partial-prompt label { font-size: 13px; font-weight: 500; color: var(--amber-text); display: block; margin-bottom: 8px; }
+  .partial-prompt textarea { width: 100%; min-height: 72px; padding: 10px 12px; border-radius: var(--radius); border: 0.5px solid var(--amber-border); background: var(--bg); color: var(--text); font-size: 13px; font-family: inherit; resize: vertical; line-height: 1.5; }
+  .partial-prompt textarea:focus { outline: none; border-color: var(--amber); }
+  .partial-prompt-btns { display: flex; gap: 8px; margin-top: 10px; }
+  .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: var(--radius); font-weight: 500; cursor: pointer; border: 0.5px solid var(--border2); background: var(--bg); color: var(--text); }
+  .btn-sm-confirm { background: var(--amber); border-color: var(--amber); color: white; }
+  .btn-sm-confirm:hover { background: var(--amber-dark); }
   .all-done-banner { background: var(--green-light); border: 0.5px solid var(--green-mid); border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 1.5rem; display: none; align-items: center; gap: 12px; }
   .all-done-banner.show { display: flex; }
   .all-done-banner i { font-size: 24px; color: var(--green); }
   .all-done-banner p { font-size: 14px; color: var(--green-deeper); font-weight: 600; }
   .all-done-banner span { font-size: 13px; color: var(--green-dark); }
-  .notes-wrap { margin-top: 4px; }
-  .notes-label { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.07em; }
+  .completed-banner { border-radius: var(--radius-lg); padding: 14px 18px; margin-bottom: 1rem; display: none; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; }
+  .completed-banner.perfect { background: var(--green-light); border: 0.5px solid var(--green-mid); color: var(--green-deeper); display: flex; }
+  .completed-banner.partial { background: var(--amber-light); border: 0.5px solid var(--amber-border); color: var(--amber-text); display: flex; }
+  .notes-wrap { margin-top: 4px; margin-bottom: 1rem; }
+  .notes-label { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.05em; }
   .notes-saved { font-size: 11px; color: var(--green); opacity: 0; transition: opacity 0.3s; font-weight: 400; text-transform: none; letter-spacing: 0; }
   .notes-saved.show { opacity: 1; }
-  .notes-box { width: 100%; min-height: 110px; padding: 12px 14px; border-radius: var(--radius); border: 0.5px solid var(--border2); background: var(--bg); color: var(--text); font-size: 14px; font-family: inherit; resize: vertical; }
+  .notes-box { width: 100%; min-height: 90px; padding: 12px 14px; border-radius: var(--radius); border: 0.5px solid var(--border2); background: var(--bg); color: var(--text); font-size: 14px; font-family: inherit; resize: vertical; line-height: 1.6; transition: border-color 0.15s; }
   .notes-box:focus { outline: none; border-color: var(--green); }
   .notes-box::placeholder { color: var(--text3); }
+  .reset-row { margin-bottom: 1.5rem; }
+  .history-wrap { }
+  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; cursor: pointer; }
+  .history-header h3 { font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+  .history-toggle-icon { font-size: 16px; color: var(--text2); transition: transform 0.2s; }
+  .history-wrap.open .history-toggle-icon { transform: rotate(180deg); }
+  .history-list { display: none; flex-direction: column; gap: 8px; }
+  .history-wrap.open .history-list { display: flex; }
+  .history-item { background: var(--bg); border-radius: var(--radius); padding: 12px 14px; border-left: 3px solid var(--border); border-top: 0.5px solid var(--border); border-right: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); }
+  .history-item.perfect { border-left-color: var(--green); }
+  .history-item.partial { border-left-color: var(--amber); }
+  .history-item.skipped { opacity: 0.6; }
+  .history-top { display: flex; justify-content: space-between; align-items: center; }
+  .history-date { font-size: 13px; font-weight: 500; }
+  .history-badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 999px; }
+  .badge-perfect { background: var(--green-light); color: var(--green-dark); }
+  .badge-partial { background: var(--amber-light); color: var(--amber-text); }
+  .badge-skipped { background: var(--bg2); color: var(--text3); }
+  .history-dims { font-size: 12px; color: var(--text2); margin-top: 4px; }
+  .history-note { font-size: 12px; color: var(--text2); margin-top: 6px; font-style: italic; border-top: 0.5px solid var(--border); padding-top: 6px; }
+  .history-empty { font-size: 13px; color: var(--text3); text-align: center; padding: 20px 0; }
   .settings-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 100; display: none; }
   .settings-overlay.open { display: block; }
-  .settings-panel { position: fixed; top: 0; right: 0; width: 360px; max-width: 95vw; height: 100%; overflow-y: auto; background: var(--bg); border-left: 0.5px solid var(--border); padding: 1.5rem; z-index: 101; display: none; flex-direction: column; gap: 1.25rem; }
-  .settings-panel.open { display: flex; }
+  .settings-panel { position: fixed; top: 0; right: 0; width: 360px; max-width: 95vw; height: 100%; overflow-y: auto; background: var(--bg); border-left: 0.5px solid var(--border); padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; z-index: 101; }
   .settings-top { display: flex; justify-content: space-between; align-items: center; }
   .settings-top h2 { font-size: 18px; font-weight: 600; }
   .close-btn { background: none; border: none; cursor: pointer; font-size: 22px; color: var(--text2); padding: 4px; display: flex; align-items: center; }
@@ -92,7 +130,6 @@
   .dim-settings-block { border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 8px; }
   .dim-settings-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; background: var(--bg); }
   .dim-settings-header:hover { background: var(--bg2); }
-  .dim-settings-header i.dim-icon-sm { font-size: 18px; color: var(--text2); }
   .dim-name-input { font-size: 14px; font-weight: 600; border: none; background: transparent; flex: 1; outline: none; min-width: 0; color: var(--text); }
   .dim-name-input:focus { background: var(--bg2); border-radius: 4px; padding: 2px 6px; }
   .dim-settings-toggle { font-size: 16px; color: var(--text3); transition: transform 0.2s; }
@@ -119,52 +156,67 @@
   <div class="topbar">
     <div class="header">
       <h1>Wellness challenge</h1>
-      <p>Check off each dimension every day. Complete all 8 to advance your streak.</p>
+      <p>Complete all 8 dimensions for a perfect day. Partial days still count.</p>
     </div>
-    <button class="settings-btn" onclick="openSettings()">
-      <i class="ti ti-settings" aria-hidden="true"></i> Settings
-    </button>
+    <button class="settings-btn" onclick="openSettings()"><i class="ti ti-settings"></i> Settings</button>
   </div>
   <div class="stats-row">
     <div class="stat"><div class="stat-label">Day</div><div class="stat-value" id="day-count">1</div><div class="stat-sub" id="stat-of">of 75</div></div>
     <div class="stat"><div class="stat-label">Days left</div><div class="stat-value" id="days-left">75</div><div class="stat-sub">remaining</div></div>
-    <div class="stat"><div class="stat-label">Streak</div><div class="stat-value" id="streak">0</div><div class="stat-sub">days complete</div></div>
+    <div class="stat"><div class="stat-label">Streak</div><div class="stat-value" id="streak">0</div><div class="stat-sub">perfect days</div></div>
+    <div class="stat perfect"><div class="stat-label">Perfect</div><div class="stat-value" id="cnt-perfect">0</div><div class="stat-sub">days</div></div>
+    <div class="stat partial"><div class="stat-label">Partial</div><div class="stat-value" id="cnt-partial">0</div><div class="stat-sub">days</div></div>
   </div>
   <div class="progress-bar-wrap">
     <div class="progress-label"><span>Overall progress</span><span id="prog-pct">0%</span></div>
     <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
   </div>
   <div class="all-done-banner" id="done-banner">
-    <i class="ti ti-trophy" aria-hidden="true"></i>
-    <div><p>All dimensions complete!</p><span>Amazing work today. Mark complete to advance your streak.</span></div>
+    <i class="ti ti-trophy"></i>
+    <div><p>All 8 dimensions complete — perfect day!</p><span>Hit "Mark perfect" to lock it in and grow your streak.</span></div>
+  </div>
+  <div class="completed-banner" id="completed-banner">
+    <i class="ti ti-check"></i><span id="completed-banner-text"></span>
   </div>
   <div class="dimensions-grid" id="dim-grid"></div>
-  <div class="bottom-row">
-    <button class="btn btn-primary" onclick="completeDay()">Mark day complete</button>
+  <div class="partial-prompt" id="partial-prompt">
+    <label>What did you miss or why was today partial? (optional)</label>
+    <textarea id="partial-note" placeholder="e.g. Skipped exercise — travel day, missed meditation..."></textarea>
+    <div class="partial-prompt-btns">
+      <button class="btn-sm btn-sm-confirm" onclick="confirmPartial()">Confirm partial day</button>
+      <button class="btn-sm" onclick="cancelPartial()">Cancel</button>
+    </div>
+  </div>
+  <div class="complete-row" id="complete-row">
+    <button class="btn btn-perfect" onclick="markPerfect()">Mark perfect day</button>
+    <button class="btn btn-partial" onclick="promptPartial()">Mark partial day</button>
     <button class="btn" onclick="toggleAll()">Check all</button>
-    <button class="btn btn-danger" onclick="resetToday()">Reset today</button>
   </div>
   <div class="notes-wrap">
-    <div class="notes-label">
-      <span>Notes for today</span>
-      <span class="notes-saved" id="notes-saved">Saved</span>
-    </div>
+    <div class="notes-label"><span>Notes for today</span><span class="notes-saved" id="notes-saved">Saved</span></div>
     <textarea class="notes-box" id="daily-notes" placeholder="How are you feeling? What went well? What was hard?"></textarea>
+  </div>
+  <div class="reset-row">
+    <button class="btn btn-danger" onclick="resetToday()">Reset today</button>
+  </div>
+  <div class="history-wrap" id="history-wrap">
+    <div class="history-header" onclick="toggleHistory()">
+      <h3><i class="ti ti-calendar"></i> Day history</h3>
+      <i class="ti ti-chevron-down history-toggle-icon"></i>
+    </div>
+    <div class="history-list" id="history-list"></div>
   </div>
 </div>
 
 <div class="settings-overlay" id="settings-overlay" onclick="overlayClick(event)"></div>
-<div class="settings-panel" id="settings-panel">
+<div class="settings-panel" id="settings-panel" style="display:none;flex-direction:column;gap:1.25rem;">
   <div class="settings-top">
     <h2>Settings</h2>
-    <button class="close-btn" onclick="closeSettings()" aria-label="Close settings"><i class="ti ti-x"></i></button>
+    <button class="close-btn" onclick="closeSettings()"><i class="ti ti-x"></i></button>
   </div>
   <div>
     <div class="settings-section-label">Challenge</div>
-    <div class="challenge-field">
-      <label for="challenge-days">Total days</label>
-      <input type="number" id="challenge-days" min="1" max="365" value="75" />
-    </div>
+    <div class="challenge-field"><label for="challenge-days">Total days</label><input type="number" id="challenge-days" min="1" max="365" value="75"/></div>
   </div>
   <div>
     <div class="settings-section-label">Dimensions &amp; tasks</div>
@@ -175,64 +227,44 @@
 </div>
 
 <script>
-const DEFAULT_DIMENSIONS = [
-  { id:"physical",  icon:"ti-run",       title:"Physical",      desc:"Exercise & movement",      tasks:["30 min workout","10,000 steps","Stretch for 10 min"] },
-  { id:"emotional", icon:"ti-heart",     title:"Emotional",     desc:"Feelings & self-awareness", tasks:["Journal for 5 min","Name 3 emotions today","Practice gratitude"] },
-  { id:"intellectual",icon:"ti-book",   title:"Intellectual",  desc:"Learning & curiosity",      tasks:["Read for 20 min","Learn something new","No mindless scrolling"] },
-  { id:"social",    icon:"ti-users",     title:"Social",        desc:"Relationships & community", tasks:["Meaningful conversation","Reach out to someone","Act of kindness"] },
-  { id:"spiritual", icon:"ti-sparkles",  title:"Spiritual",     desc:"Purpose & meaning",         tasks:["5 min meditation","Reflect on values","Time in nature"] },
-  { id:"environmental",icon:"ti-leaf",  title:"Environmental", desc:"Spaces & surroundings",     tasks:["Tidy your space","Spend time outside","Reduce screen time"] },
-  { id:"occupational",icon:"ti-briefcase",title:"Occupational",desc:"Work & purpose",            tasks:["Work on a goal","Set tomorrow's priorities","Rest from work tonight"] },
-  { id:"financial", icon:"ti-coin",      title:"Financial",     desc:"Money & security",          tasks:["Track spending","No impulse purchases","Review one financial goal"] }
-];
-
-const todayKey = () => new Date().toISOString().split("T")[0];
-let state = JSON.parse(localStorage.getItem("wellness_state") || "{}");
-let config = JSON.parse(localStorage.getItem("wellness_config") || JSON.stringify({ days:75, dimensions:DEFAULT_DIMENSIONS }));
-let saveTimer = null;
-
-function getToday() {
-  const k = todayKey();
-  if (!state[k]) state[k] = { tasks:{}, completed:false, notes:"" };
-  return state[k];
-}
-function save() { localStorage.setItem("wellness_state", JSON.stringify(state)); }
-function saveConfig() { localStorage.setItem("wellness_config", JSON.stringify(config)); }
-
-function getStreak() {
-  let s=0; const today=new Date();
-  for (let i=0;i<config.days;i++) {
-    const d=new Date(today); d.setDate(d.getDate()-i);
-    const k=d.toISOString().split("T")[0];
-    if (state[k]&&state[k].completed) s++; else if (i>0) break;
-  }
-  return s;
-}
-function getDayCount() { return Math.min(Object.values(state).filter(d=>d.completed).length+1,config.days); }
-function allChecked() {
-  const today=getToday();
-  return config.dimensions.every(dim=>dim.tasks.every(function(_,ti){return today.tasks[dim.id+"_"+ti];}));
-}
-function saveNotes(val) {
-  getToday().notes=val; save();
-  clearTimeout(saveTimer);
-  var el=document.getElementById("notes-saved");
-  el.classList.add("show");
-  saveTimer=setTimeout(function(){el.classList.remove("show");},1800);
-}
-function render() {
-  var today=getToday();
-  var dayCount=getDayCount();
-  var pct=Math.round((Object.values(state).filter(function(d){return d.completed;}).length/config.days)*100);
+const DEFAULT_DIMENSIONS=[{id:"physical",icon:"ti-run",title:"Physical",desc:"Exercise & movement",tasks:["30 min workout","10,000 steps","Stretch for 10 min"]},{id:"emotional",icon:"ti-heart",title:"Emotional",desc:"Feelings & self-awareness",tasks:["Journal for 5 min","Name 3 emotions today","Practice gratitude"]},{id:"intellectual",icon:"ti-book",title:"Intellectual",desc:"Learning & curiosity",tasks:["Read for 20 min","Learn something new","No mindless scrolling"]},{id:"social",icon:"ti-users",title:"Social",desc:"Relationships & community",tasks:["Meaningful conversation","Reach out to someone","Act of kindness"]},{id:"spiritual",icon:"ti-sparkles",title:"Spiritual",desc:"Purpose & meaning",tasks:["5 min meditation","Reflect on values","Time in nature"]},{id:"environmental",icon:"ti-leaf",title:"Environmental",desc:"Spaces & surroundings",tasks:["Tidy your space","Spend time outside","Reduce screen time"]},{id:"occupational",icon:"ti-briefcase",title:"Occupational",desc:"Work & purpose",tasks:["Work on a goal","Set tomorrow's priorities","Rest from work tonight"]},{id:"financial",icon:"ti-coin",title:"Financial",desc:"Money & security",tasks:["Track spending","No impulse purchases","Review one financial goal"]}];
+const todayKey=()=>new Date().toISOString().split("T")[0];
+let state=JSON.parse(localStorage.getItem("wellness_state")||"{}");
+let config=JSON.parse(localStorage.getItem("wellness_config")||JSON.stringify({days:75,dimensions:DEFAULT_DIMENSIONS}));
+let saveTimer=null;
+function getToday(){const k=todayKey();if(!state[k])state[k]={tasks:{},status:null,partialNote:"",notes:""};return state[k];}
+function save(){localStorage.setItem("wellness_state",JSON.stringify(state));}
+function saveConfig(){localStorage.setItem("wellness_config",JSON.stringify(config));}
+function allChecked(){const t=getToday();return config.dimensions.every(d=>d.tasks.every((_,ti)=>t.tasks[d.id+"_"+ti]));}
+function getPerfectStreak(){let s=0;const today=new Date();for(let i=1;i<=config.days;i++){const d=new Date(today);d.setDate(d.getDate()-i);const k=d.toISOString().split("T")[0];if(state[k]&&state[k].status==="perfect")s++;else break;}return s;}
+function getDayCount(){return Math.min(Object.values(state).filter(d=>d.status).length+1,config.days);}
+function saveNotes(val){getToday().notes=val;save();clearTimeout(saveTimer);var el=document.getElementById("notes-saved");el.classList.add("show");saveTimer=setTimeout(function(){el.classList.remove("show");},1800);}
+function markPerfect(){if(!allChecked()){alert("All dimensions must be complete to mark a perfect day.");return;}getToday().status="perfect";save();render();}
+function promptPartial(){if(getToday().status)return;document.getElementById("partial-note").value="";document.getElementById("partial-prompt").classList.add("show");document.getElementById("complete-row").style.display="none";document.getElementById("partial-note").focus();}
+function cancelPartial(){document.getElementById("partial-prompt").classList.remove("show");document.getElementById("complete-row").style.display="flex";}
+function confirmPartial(){var note=document.getElementById("partial-note").value.trim();getToday().status="partial";getToday().partialNote=note;save();document.getElementById("partial-prompt").classList.remove("show");document.getElementById("complete-row").style.display="flex";render();}
+function toggleAll(){var today=getToday(),allOn=allChecked();config.dimensions.forEach(function(dim){dim.tasks.forEach(function(_,ti){today.tasks[dim.id+"_"+ti]=!allOn;});});save();render();}
+function resetToday(){if(!confirm("Reset all of today's progress?"))return;var k=todayKey();state[k]={tasks:{},status:null,partialNote:"",notes:""};save();document.getElementById("partial-prompt").classList.remove("show");document.getElementById("complete-row").style.display="flex";render();}
+function formatDate(s){var d=new Date(s+"T12:00:00");return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});}
+function render(){
+  var today=getToday(),dayCount=getDayCount();
+  var totalCompleted=Object.values(state).filter(function(d){return d.status;}).length;
+  var perfectCount=Object.values(state).filter(function(d){return d.status==="perfect";}).length;
+  var partialCount=Object.values(state).filter(function(d){return d.status==="partial";}).length;
+  var pct=Math.round((totalCompleted/config.days)*100);
   document.getElementById("day-count").textContent=dayCount;
   document.getElementById("stat-of").textContent="of "+config.days;
   document.getElementById("days-left").textContent=Math.max(config.days-dayCount+1,0);
-  document.getElementById("streak").textContent=getStreak();
+  document.getElementById("streak").textContent=getPerfectStreak();
+  document.getElementById("cnt-perfect").textContent=perfectCount;
+  document.getElementById("cnt-partial").textContent=partialCount;
   document.getElementById("prog-pct").textContent=pct+"%";
   document.getElementById("prog-fill").style.width=pct+"%";
-  document.getElementById("done-banner").classList.toggle("show",allChecked()&&!today.completed);
-  var ta=document.getElementById("daily-notes");
-  if (ta&&document.activeElement!==ta) ta.value=today.notes||"";
+  var doneBanner=document.getElementById("done-banner"),completedBanner=document.getElementById("completed-banner"),completeRow=document.getElementById("complete-row");
+  if(today.status==="perfect"){doneBanner.classList.remove("show");completedBanner.className="completed-banner perfect";document.getElementById("completed-banner-text").textContent="Perfect day locked in! All 8 dimensions complete.";completeRow.style.display="none";}
+  else if(today.status==="partial"){doneBanner.classList.remove("show");completedBanner.className="completed-banner partial";var note=today.partialNote?' "'+today.partialNote+'"':"";document.getElementById("completed-banner-text").textContent="Partial day logged."+note;completeRow.style.display="none";}
+  else{completedBanner.className="completed-banner";doneBanner.classList.toggle("show",allChecked());completeRow.style.display="flex";}
+  var ta=document.getElementById("daily-notes");if(ta&&document.activeElement!==ta)ta.value=today.notes||"";
   var grid=document.getElementById("dim-grid");
   var expandedCard=document.querySelector(".dim-card.expanded");
   var expandedId=expandedCard?expandedCard.getAttribute("data-id"):null;
@@ -243,49 +275,44 @@ function render() {
     var card=document.createElement("div");
     card.className="dim-card"+(dimDone?" done":"")+(expandedId===dim.id?" expanded":"");
     card.setAttribute("data-id",dim.id);
-    card.innerHTML='<div class="dim-header"><div class="dim-icon"><i class="ti '+dim.icon+'" aria-hidden="true"></i></div><div><div class="dim-title">'+dim.title+'</div><div class="dim-desc">'+dim.desc+'</div></div></div><div class="dim-check"><i class="ti ti-check" aria-hidden="true"></i></div><div class="dim-tasks">'+dim.tasks.map(function(t,ti){return '<div class="task-item"><input type="checkbox" data-dim="'+dim.id+'" data-ti="'+ti+'" '+(today.tasks[dim.id+"_"+ti]?"checked":"")+' /><label>'+t+'</label></div>';}).join("")+'</div>';
-    card.querySelector(".dim-header").addEventListener("click",function(){
-      var isExp=card.classList.contains("expanded");
-      document.querySelectorAll(".dim-card").forEach(function(c){c.classList.remove("expanded");});
-      if(!isExp) card.classList.add("expanded");
-    });
-    card.querySelectorAll("input[type=checkbox]").forEach(function(cb){
-      cb.addEventListener("change",function(e){
-        e.stopPropagation();
-        getToday().tasks[e.target.getAttribute("data-dim")+"_"+e.target.getAttribute("data-ti")]=e.target.checked;
-        save(); render();
-      });
-    });
+    card.innerHTML='<div class="dim-header"><div class="dim-icon"><i class="ti '+dim.icon+'"></i></div><div><div class="dim-title">'+dim.title+'</div><div class="dim-desc">'+tasksChecked+'/'+dim.tasks.length+' · '+dim.desc+'</div></div></div><div class="dim-check"><i class="ti ti-check"></i></div><div class="dim-tasks">'+dim.tasks.map(function(t,ti){var c=today.tasks[dim.id+"_"+ti];return'<label class="task-item '+(c?"checked":"")+'"><input type="checkbox" '+(c?"checked":"")+'  data-dim="'+dim.id+'" data-ti="'+ti+'"/>'+t+'</label>';}).join("")+'</div>';
+    card.querySelector(".dim-header").addEventListener("click",function(){var isExp=card.classList.contains("expanded");document.querySelectorAll(".dim-card").forEach(function(c){c.classList.remove("expanded");});if(!isExp)card.classList.add("expanded");});
+    card.querySelectorAll("input[type=checkbox]").forEach(function(cb){cb.addEventListener("change",function(e){e.stopPropagation();getToday().tasks[e.target.getAttribute("data-dim")+"_"+e.target.getAttribute("data-ti")]=e.target.checked;save();render();});});
     grid.appendChild(card);
   });
+  renderHistory();
 }
-document.getElementById("daily-notes").addEventListener("input",function(e){saveNotes(e.target.value);});
-function completeDay(){if(!allChecked()){alert("Complete all tasks in all dimensions first!");return;}getToday().completed=true;save();render();}
-function toggleAll(){var today=getToday(),allOn=allChecked();config.dimensions.forEach(function(dim){dim.tasks.forEach(function(_,ti){today.tasks[dim.id+"_"+ti]=!allOn;});});save();render();}
-function resetToday(){var k=todayKey();if(state[k])state[k]={tasks:{},completed:false,notes:""};save();render();}
-function openSettings(){document.getElementById("challenge-days").value=config.days;renderDimSettings();document.getElementById("settings-overlay").classList.add("open");document.getElementById("settings-panel").classList.add("open");}
-function closeSettings(){document.getElementById("settings-overlay").classList.remove("open");document.getElementById("settings-panel").classList.remove("open");}
+function renderHistory(){
+  var list=document.getElementById("history-list");
+  var keys=Object.keys(state).sort(function(a,b){return b.localeCompare(a);}).filter(function(k){return k!==todayKey();});
+  if(keys.length===0){list.innerHTML='<div class="history-empty">No past days yet — come back tomorrow!</div>';return;}
+  list.innerHTML=keys.map(function(k){
+    var d=state[k],status=d.status||"skipped";
+    var dimsDone=config.dimensions.filter(function(dim){return dim.tasks.every(function(_,ti){return d.tasks&&d.tasks[dim.id+"_"+ti];});}).length;
+    var badgeClass=status==="perfect"?"badge-perfect":status==="partial"?"badge-partial":"badge-skipped";
+    var badgeLabel=status==="perfect"?"Perfect":status==="partial"?"Partial":"Skipped";
+    var noteHtml=d.partialNote?'<div class="history-note"><i class="ti ti-message-circle"></i> '+d.partialNote+'</div>':"";
+    var genNote=d.notes?'<div class="history-note">'+d.notes+'</div>':"";
+    return'<div class="history-item '+status+'"><div class="history-top"><span class="history-date">'+formatDate(k)+'</span><span class="history-badge '+badgeClass+'">'+badgeLabel+'</span></div><div class="history-dims">'+dimsDone+'/'+config.dimensions.length+' dimensions complete</div>'+noteHtml+genNote+'</div>';
+  }).join("");
+}
+function toggleHistory(){document.getElementById("history-wrap").classList.toggle("open");renderHistory();}
+function openSettings(){document.getElementById("challenge-days").value=config.days;renderDimSettings();document.getElementById("settings-overlay").classList.add("open");document.getElementById("settings-panel").style.display="flex";}
+function closeSettings(){document.getElementById("settings-overlay").classList.remove("open");document.getElementById("settings-panel").style.display="none";}
 function overlayClick(e){if(e.target===document.getElementById("settings-overlay"))closeSettings();}
 function renderDimSettings(){
   var list=document.getElementById("dim-settings-list");list.innerHTML="";
   config.dimensions.forEach(function(dim,di){
     var block=document.createElement("div");block.className="dim-settings-block";
-    block.innerHTML='<div class="dim-settings-header" onclick="this.parentElement.classList.toggle(\'open\')"><i class="ti '+dim.icon+' dim-icon-sm" aria-hidden="true"></i><input class="dim-name-input" type="text" value="'+dim.title+'" /><i class="ti ti-chevron-down dim-settings-toggle" aria-hidden="true"></i></div><div class="dim-tasks-edit">'+dim.tasks.map(function(t,ti){return '<div class="task-edit-row"><input type="text" value="'+t+'" /><button class="task-del-btn" onclick="deleteTask('+di+','+ti+')" aria-label="Delete task"><i class="ti ti-x" aria-hidden="true"></i></button></div>';}).join("")+'<button class="add-task-btn" onclick="addTask('+di+')"><i class="ti ti-plus" aria-hidden="true"></i>Add task</button></div>';
+    block.innerHTML='<div class="dim-settings-header" onclick="this.parentElement.classList.toggle(\'open\')"><i class="ti '+dim.icon+'" style="font-size:18px;color:var(--text2)"></i><input class="dim-name-input" type="text" value="'+dim.title+'" data-di="'+di+'" onclick="event.stopPropagation()"/><i class="ti ti-chevron-down dim-settings-toggle"></i></div><div class="dim-tasks-edit">'+dim.tasks.map(function(t,ti){return'<div class="task-edit-row"><input type="text" value="'+t+'" data-di="'+di+'" data-ti="'+ti+'"/><button class="task-del-btn" onclick="deleteTask('+di+','+ti+')"><i class="ti ti-trash"></i></button></div>';}).join('')+'<button class="add-task-btn" onclick="addTask('+di+')"><i class="ti ti-plus"></i> Add task</button></div>';
     list.appendChild(block);
   });
 }
 function addTask(di){config.dimensions[di].tasks.push("New task");renderDimSettings();document.querySelectorAll(".dim-settings-block")[di].classList.add("open");}
 function deleteTask(di,ti){if(config.dimensions[di].tasks.length<=1){alert("Each dimension needs at least one task.");return;}config.dimensions[di].tasks.splice(ti,1);renderDimSettings();document.querySelectorAll(".dim-settings-block")[di].classList.add("open");}
-function saveSettings(){
-  config.days=parseInt(document.getElementById("challenge-days").value)||75;
-  document.querySelectorAll(".dim-settings-block").forEach(function(block,di){
-    var n=block.querySelector(".dim-name-input");
-    if(n)config.dimensions[di].title=n.value.trim()||config.dimensions[di].title;
-    block.querySelectorAll(".task-edit-row input[type=text]").forEach(function(inp,ti){config.dimensions[di].tasks[ti]=inp.value.trim()||config.dimensions[di].tasks[ti];});
-  });
-  saveConfig();closeSettings();render();
-}
-function resetAllData(){if(confirm("This will delete all your progress. Are you sure?")){localStorage.removeItem("wellness_state");localStorage.removeItem("wellness_config");state={};config=JSON.parse(JSON.stringify({days:75,dimensions:DEFAULT_DIMENSIONS}));saveConfig();render();closeSettings();}}
+function saveSettings(){config.days=parseInt(document.getElementById("challenge-days").value)||75;document.querySelectorAll(".dim-settings-block").forEach(function(block,di){var n=block.querySelector(".dim-name-input");if(n)config.dimensions[di].title=n.value.trim()||config.dimensions[di].title;block.querySelectorAll(".task-edit-row input[type=text]").forEach(function(inp,ti){config.dimensions[di].tasks[ti]=inp.value.trim()||config.dimensions[di].tasks[ti];});});saveConfig();closeSettings();render();}
+function resetAllData(){if(confirm("This will delete all your progress. Are you sure?")){localStorage.removeItem("wellness_state");localStorage.removeItem("wellness_config");state={};config=JSON.parse(JSON.stringify({days:75,dimensions:DEFAULT_DIMENSIONS}));closeSettings();render();}}
+document.getElementById("daily-notes").addEventListener("input",function(e){saveNotes(e.target.value);});
 render();
 </script>
 </body>
